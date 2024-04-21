@@ -9,25 +9,16 @@ pipeline {
     stages {
         stage('Install Plugins') {
             steps {
-                // Install Terraform and Ansible plugins
                 script {
                     def plugins = ['terraform', 'ansible']
                     plugins.each {
                         plugin -> 
-                            if (!jenkins.model.Jenkins.instance.getPluginManager().getPlugin(plugin)) {
+                            if (!pluginInstalled(plugin)) {
                                 println "Installing ${plugin} plugin..."
-                                jenkins.model.Jenkins.instance.getPluginManager().installPlugin(plugin)
+                                installPlugin(plugin)
                             }
                     }
                 }
-
-                // Restart Jenkins to apply plugin changes
-                script {
-                    echo "Restarting Jenkins..."
-                    restart() // Restart Jenkins
-                }
-                // Wait for Jenkins to restart
-                sleep 60
             }
         }
 
@@ -61,7 +52,6 @@ pipeline {
                 sh 'ansible-playbook -i inventory playbook.yml'
             }
         }
-      
     }
 
     post {
@@ -74,4 +64,16 @@ pipeline {
             echo 'Pipeline failed!'
         }
     }
+}
+
+def pluginInstalled(pluginName) {
+    def plugins = Jenkins.instance.pluginManager.plugins
+    return plugins.any { plugin -> plugin.shortName == pluginName }
+}
+
+def installPlugin(pluginName) {
+    def pluginManager = Jenkins.instance.pluginManager
+    def installJob = pluginManager.installPlugin(pluginName)
+    installJob.get()
+    pluginManager.restart()
 }
