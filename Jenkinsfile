@@ -16,6 +16,22 @@ pipeline {
             }
         }
 
+        stage('Install Plugins') {
+            steps {
+                script {
+                    // Install Terraform and Ansible plugins
+                    def plugins = ['terraform', 'ansible']
+                    plugins.each {
+                        plugin ->
+                            if (!pluginInstalled(plugin)) {
+                                println "Installing ${plugin} plugin..."
+                                installPlugin(plugin)
+                            }
+                    }
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 // Checkout the code from your version control system (e.g., Git)
@@ -25,7 +41,7 @@ pipeline {
 
         stage('Terraform Apply') {
             steps {
-                // Run Terraform to provision EC2 instances
+                // Make sure Terraform is available in the PATH
                 sh 'terraform init'
                 sh 'terraform apply -auto-approve'
             }
@@ -33,7 +49,7 @@ pipeline {
 
         stage('Ansible Playbook Execution') {
             steps {
-                // Run Ansible playbook to install and configure Nginx
+                // Execute Ansible playbook
                 sh 'ansible-playbook -i inventory playbook.yml'
             }
         }
@@ -49,4 +65,16 @@ pipeline {
             echo 'Pipeline failed!'
         }
     }
+}
+
+def pluginInstalled(pluginName) {
+    def plugins = Jenkins.instance.pluginManager.plugins
+    return plugins.any { plugin -> plugin.shortName == pluginName }
+}
+
+def installPlugin(pluginName) {
+    def pluginManager = Jenkins.instance.pluginManager
+    def installJob = pluginManager.installPlugin(pluginName)
+    installJob.get()
+    pluginManager.restart()
 }
