@@ -55,12 +55,12 @@ pipeline {
             }
         }
 
-        stage('Ansible Playbook Execution') {
-            steps {
-                // Run Ansible playbook to install and configure Nginx
-                sh 'ansible-playbook -i inventory playbook.yml'
-            }
-        }
+        // stage('Ansible Playbook Execution') {
+        //     steps {
+        //         // Run Ansible playbook to install and configure Nginx
+        //         sh 'ansible-playbook -i inventory playbook.yml'
+        //     }
+        // }
 
         stage('Post-Deployment Checks') {
             steps {
