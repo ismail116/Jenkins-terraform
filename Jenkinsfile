@@ -7,21 +7,6 @@ pipeline {
     }
     
     stages {
-        stage('Install Plugins') {
-            steps {
-                script {
-                    def plugins = ['terraform', 'ansible']
-                    plugins.each {
-                        plugin -> 
-                            if (!pluginInstalled(plugin)) {
-                                println "Installing ${plugin} plugin..."
-                                installPlugin(plugin)
-                            }
-                    }
-                }
-            }
-        }
-
         stage('Set AWS Credentials') {
             steps {
                 withCredentials([string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
@@ -64,16 +49,4 @@ pipeline {
             echo 'Pipeline failed!'
         }
     }
-}
-
-def pluginInstalled(pluginName) {
-    def plugins = pluginManager.plugins
-    return plugins.any { plugin -> plugin.shortName == pluginName }
-}
-
-def installPlugin(pluginName) {
-    def pluginManager = Jenkins.instance.pluginManager
-    def installJob = pluginManager.installPlugin(pluginName)
-    installJob.get()
-    pluginManager.restart()
 }
