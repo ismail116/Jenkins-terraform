@@ -19,7 +19,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the code from your version control system (e.g., Git)
-                git 'https://github.com/ismail116/Jenkins-terraform.git'
+                git branch: 'main', url: 'https://github.com/ismail116/Jenkins-terraform.git'
             }
         }
 
