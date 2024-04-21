@@ -67,7 +67,7 @@ pipeline {
 }
 
 def pluginInstalled(pluginName) {
-    def plugins = Jenkins.instance.pluginManager.plugins
+    def plugins = pluginManager.plugins
     return plugins.any { plugin -> plugin.shortName == pluginName }
 }
 
