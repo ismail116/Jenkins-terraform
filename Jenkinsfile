@@ -1,9 +1,11 @@
 pipeline {
     agent any
+    
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-    }    
+    }
+    
     stages {
         stage('Install Plugins') {
             steps {
@@ -29,13 +31,6 @@ pipeline {
             }
         }
 
-        
-        stage('Checkout') {
-            steps {
-                // Checkout the code from your version control system (e.g., Git)
-                git 'https://github.com/ismail116/Jenkins-terraform.git'
-            }
-        }
         stage('Set AWS Credentials') {
             steps {
                 withCredentials([string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
@@ -44,7 +39,14 @@ pipeline {
                 }
             }
         }
-        
+
+        stage('Checkout') {
+            steps {
+                // Checkout the code from your version control system (e.g., Git)
+                git 'https://github.com/ismail116/Jenkins-terraform.git'
+            }
+        }
+
         stage('Terraform Apply') {
             steps {
                 // Run Terraform to provision EC2 instances
@@ -52,29 +54,17 @@ pipeline {
                 sh 'terraform apply -auto-approve'
             }
         }
-        
-        // stage('Generate Ansible Inventory') {
-        //     steps {
-        //         // Generate Ansible inventory file dynamically based on Terraform output
-        //         sh 'terraform output ansible_inventory > inventory.yaml'
-        //     }
-        // }
-        
+
         stage('Ansible Playbook Execution') {
             steps {
                 // Run Ansible playbook to install and configure Nginx
                 sh 'ansible-playbook -i inventory playbook.yml'
             }
         }
+
         
-    //     stage('Post-Deployment Checks') {
-    //         steps {
-    //             // Perform any post-deployment tests or checks
-    //             // This step is optional and can be customized based on your requirements
-    //         }
-    //     }
-    // }
-    
+    }
+
     post {
         success {
             // Send success notifications (e.g., Slack, email) if the pipeline succeeds
