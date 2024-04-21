@@ -6,30 +6,30 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
     }
     
-    stages {
-        stage('Install Plugins') {
-            steps {
-                // Install Terraform and Ansible plugins
-                script {
-                    def plugins = ['terraform', 'ansible']
-                    plugins.each {
-                        plugin -> 
-                            if (!jenkins.model.Jenkins.instance.getPluginManager().getPlugin(plugin)) {
-                                println "Installing ${plugin} plugin..."
-                                jenkins.model.Jenkins.instance.getPluginManager().installPlugin(plugin)
-                            }
+    stage('Install Plugins') {
+    steps {
+        // Install Terraform and Ansible plugins
+        script {
+            def plugins = ['terraform', 'ansible']
+            plugins.each {
+                plugin -> 
+                    if (!jenkins.model.Jenkins.instance.getPluginManager().getPlugin(plugin)) {
+                        println "Installing ${plugin} plugin..."
+                        jenkins.model.Jenkins.instance.getPluginManager().installPlugin(plugin)
                     }
-                }
-
-                // Restart Jenkins to apply plugin changes
-                script {
-                    echo "Restarting Jenkins..."
-                    restart() // Restart Jenkins
-                }
-                // Wait for Jenkins to restart
-                sleep 60
             }
         }
+
+        // Restart Jenkins to apply plugin changes
+        script {
+            echo "Restarting Jenkins..."
+            restart() // Restart Jenkins
+        }
+        // Wait for Jenkins to restart
+        sleep 60
+    }
+}
+
 
         stage('Set AWS Credentials') {
             steps {
