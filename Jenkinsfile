@@ -45,7 +45,7 @@ pipeline {
                 // Make sure Terraform is available in the PATH
                 sh 'terraform init'
                 sh 'terraform apply -auto-approve'
-                sh 'sleep 30'
+                sh 'sleep 60'
             }
         }
 
