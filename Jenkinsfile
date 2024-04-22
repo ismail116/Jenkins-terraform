@@ -52,7 +52,7 @@ pipeline {
         stage('Ansible Playbook Execution') {
             steps {
                 // Execute Ansible playbook
-                sh 'ansible-playbook -i inventory -u ubuntu --private-key=/var/jenkins_home/.ssh/id_rsa playbook.yml'
+                sh 'ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i inventory -u ubuntu --private-key=/var/jenkins_home/.ssh/id_rsa playbook.yml'
             }
         }
     }
